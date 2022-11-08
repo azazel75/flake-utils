@@ -54,15 +54,8 @@ let
       packages = pkgs.${name} or { };
     in
     {
-      # Use the legacy packages since it's more forgiving.
-      legacyPackages = packages;
+      inherit packages;
     }
-    //
-    (
-      if packages ? defaultPackage then {
-        defaultPackage = packages.defaultPackage;
-      } else { }
-    )
     //
     (
       if packages ? checks then {
