@@ -50,24 +50,30 @@ let
           system
           ;
       };
+      inherit (pkgs.lib) filterAttrs;
+      inherit (builtins) all;
 
-      packages = pkgs.${name} or { };
+      prePackages = pkgs.${name} or { };
     in
     {
-      inherit packages;
+      packages = filterAttrs (k: v: all (e: e != k)
+        [ "apps" "checks" "devShells" ])
+        prePackages;
     }
     //
     (
-      if packages ? checks then {
-        checks = packages.checks;
+      if prePackages ? checks then {
+        checks = prePackages.checks;
       } else { }
     )
     //
     (
       if shell != null then {
-        devShell = shell_ { inherit pkgs; };
-      } else if packages ? devShell then {
-        devShell = packages.devShell;
+        devShells.default = shell_ { inherit pkgs; };
+      } else if prePackages ? devShells then {
+        devShells = prePackages.devShells;
+      } else { }
+    )
       } else { }
     )
   );
