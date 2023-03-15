@@ -41,7 +41,7 @@ let
 
   shell_ = maybeImport shell;
 
-  outputs = lib.eachSystem systems (system:
+  systemOutputs = lib.eachSystem systems (system:
     let
       pkgs = import nixpkgs {
         inherit
@@ -50,7 +50,7 @@ let
           system
           ;
       };
-      inherit (pkgs.lib) filterAttrs;
+      inherit (pkgs.lib) composeManyExtensions filterAttrs;
       inherit (builtins) all;
 
       prePackages = pkgs.${name} or { };
@@ -81,5 +81,11 @@ let
       } else { }
     )
   );
+  outOverlays = {
+    default = overlay;
+    all = overlays;
+    pre = preOverlays;
+    composed = nixpkgs.lib.composeManyExtensions overlays;
+  };
 in
-outputs
+(systemOutputs // { overlays = outOverlays; })
