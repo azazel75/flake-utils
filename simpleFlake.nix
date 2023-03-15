@@ -74,6 +74,10 @@ let
         devShells = prePackages.devShells;
       } else { }
     )
+    //
+    (
+      if prePackages ? apps then {
+        apps = prePackages.apps;
       } else { }
     )
   );
